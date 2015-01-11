@@ -5,6 +5,10 @@ import unittest
 from storm import Model
 from filter_clause import FilterClause
 
+
+Q = FilterClause
+
+
 class TestModel(Model):
     table = "test"
 
@@ -40,6 +44,16 @@ class StormTest(unittest.TestCase):
 
         expected_query = 'SELECT * FROM test WHERE age>25;'
         assert query == expected_query 
+
+    def test_complex_query(self):
+
+        query = TestModel.filter(Q(key="age", value=25) &
+                                 Q(key="name", value="Akshay") |
+                                 Q(key="name", value="Nitish") |
+                                 Q(key="company", value="Red Panda"))
+
+        expected_query = 'SELECT * FROM test WHERE age=25 AND name="Akshay" OR name="Nitish" OR company="Red Panda";'
+        assert query == expected_query
 
 
 class FilterClauseTest(unittest.TestCase):

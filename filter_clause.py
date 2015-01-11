@@ -12,9 +12,26 @@ class FilterClause(object):
         "gte": ">=",
     }
 
-    def __init__(self, key, value):
+    def __init__(self, key=None, value=None):
         self.key = key
         self.value = value
+
+    def __and__(self, obj):
+        if isinstance(obj, FilterClause):
+            return "{0} AND {1}".format(self.to_query(), obj.to_query())
+        elif isinstance(obj, (str, unicode)):
+            return "{0} AND {1}".format(self.to_query(), obj)
+
+        raise TypeError
+
+    def __or__(self, obj):
+        if isinstance(obj, FilterClause):
+            return "{0} OR {1}".format(self.to_query(), obj.to_query())
+
+        elif isinstance(obj, (str, unicode)):
+            return "{0} OR {1}".format(self.to_query(), obj)
+
+        raise TypeError
 
     def _clean_value(cls, value):
         if isinstance(value, (str, unicode)):
